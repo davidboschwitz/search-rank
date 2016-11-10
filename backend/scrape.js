@@ -1,0 +1,6 @@
+
+
+
+function scrape(url){
+
+}

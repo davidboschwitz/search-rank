@@ -1,0 +1,23 @@
+{
+    "manifest_version": 2,
+    "name": "My Cool Extension",
+    "version": "0.1",
+    "background": {
+        "scripts": []
+    },
+    "browser_action": {
+        "default_title": "SearchRank",
+        "default_icon": "icon.png",
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "storage"
+    ],
+    "web_accessible_resources": ["jquery.min.js", "index.js", "upvote.png", "downvote.png"],
+    "content_scripts": [{
+        "matches": [
+            "<all_urls>"
+        ],
+        "js": ["jquery.min.js", "index.js"]
+    }]
+}

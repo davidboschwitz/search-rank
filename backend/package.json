@@ -1,0 +1,29 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "blahblahblhja",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "*",
+    "https": "^1.0.0",
+    "mysql": "^2.11.1",
+    "natural": "^0.4.0",
+    "request": "^2.75.0",
+    "unfluff": "^1.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "davidboschwitz",
+  "license": "APACHE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JefferySchons/SE329CycloneSquadProject2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JefferySchons/SE329CycloneSquadProject2/issues"
+  },
+  "homepage": "https://github.com/JefferySchons/SE329CycloneSquadProject2#readme"
+}
