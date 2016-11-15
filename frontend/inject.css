@@ -1,0 +1,7 @@
+.up>span>.uparrow {
+    filter: grayscale(0%)!important;
+}
+
+.down>span>.downarrow {
+    filter: grayscale(0%)!important;
+}

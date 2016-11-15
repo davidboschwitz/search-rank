@@ -16,7 +16,8 @@
     ],
     "web_accessible_resources": [
       "jquery.min.js",
-      "index.js",
+      "inject.js",
+      "inject.css",
       "upvote.png",
       "downvote.png"],
     "content_scripts": [{
