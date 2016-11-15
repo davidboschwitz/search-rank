@@ -1,19 +1,24 @@
 {
     "manifest_version": 2,
-    "name": "My Cool Extension",
+    "name": "Search Rank",
     "version": "0.1",
     "background": {
-        "scripts": []
+        "scripts": ["background.js"],
+        "persistent": false
     },
-    "browser_action": {
+    "page_action": {
         "default_title": "SearchRank",
-        "default_icon": "icon.png",
-        "default_popup": "popup.html"
+        "default_icon": "icon.png"
     },
     "permissions": [
+        "declarativeContent",
         "storage"
     ],
-    "web_accessible_resources": ["jquery.min.js", "index.js", "upvote.png", "downvote.png"],
+    "web_accessible_resources": [
+      "jquery.min.js",
+      "index.js",
+      "upvote.png",
+      "downvote.png"],
     "content_scripts": [{
         "matches": [
             "<all_urls>"
