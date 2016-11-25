@@ -105,7 +105,14 @@ function loadit() {
             console.log(data);
             x.uid = data.data[0].uid;
             x.votes = data.data[0].votes;
-            x.element.innerHTML = '<table><tbody><tr><td style="text-align:center" class="' + (votes[x.uid] + 1 ? (votes[x.uid] == 1 ? 'up' : 'down') : '') + '"><span onclick="vote(this,' + x.index + ',' + x.uid + ',\'up\')"><img src="' + chrome.extension.getURL('/upvote.png') + '" style="filter:grayscale(100%)" class="uparrow" /></span><br><span class="votes">' + x.votes + '</span><br><span onclick="vote(this,' + x.index + ',' + x.uid + ',\'down\')"><img src="' + chrome.extension.getURL('/downvote.png') + '" style="filter:grayscale(100%)" class="downarrow" /></span></td><td>' + x.element.childNodes[0].innerHTML + (x.element.childNodes[1] ? x.element.childNodes[1].innerHTML : "") + '</td></tr></tbody></table>';
+            x.element.innerHTML = '<table><tbody><tr><td style="text-align:center" class="'
+                                  + (votes[x.uid] + 1 ? (votes[x.uid] == 1 ? 'up' : 'down') : '') + '"><span onclick="vote(this,'
+                                  + x.index + ',' + x.uid + ',\'up\')"><img src="' + chrome.extension.getURL('/upvote.png')
+                                  + '" style="filter:grayscale(100%)" class="uparrow" /></span><br><span class="votes">' + x.votes
+                                  + '</span><br><span onclick="vote(this,' + x.index + ',' + x.uid + ',\'down\')"><img src="'
+                                  + chrome.extension.getURL('/downvote.png')
+                                  + '" style="filter:grayscale(100%)" class="downarrow" /></span></td><td>' + x.element.childNodes[0].innerHTML
+                                  + (x.element.childNodes[1] ? x.element.childNodes[1].innerHTML : "") + '</td></tr></tbody></table>';
             // here is the best place you could inject your html into the element using x.element.innerHTML or something
 
             if (i == len - 1) {
