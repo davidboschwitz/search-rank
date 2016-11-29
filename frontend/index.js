@@ -23,8 +23,19 @@ $(window).on('load', function() {
 //         'uid': uid,
 //         'index': index
 //     }
-// }));
-
+// // }));
+// function vote(event){
+//   console.log('new vote', event);
+//   var index = event.detail.index;
+//   var direction = event.detail.direction;
+//   var uid = event.detail.uid;
+//   var x = data[index];
+//   var include = direction == 'up';
+//   var tmp = $(x.element).children().children().children().children();
+//   tmp.removeClass('up');
+//   tmp.removeClass('down');
+//   tmp.addClass(direction);
+// }
 
 function addVoteListener() {
   votelistener = true;
@@ -41,25 +52,25 @@ function addVoteListener() {
                 return;
             doubleflag = 2;
         }
-        x.votes = x.votes + (direction == "up" ? doubleflag * 1 : doubleflag * -1);
-        $($(x.element).children().children().children().children()[0]).children('.votes')[0].innerHTML = x.votes;
+        // x.votes = x.votes + (direction == "up" ? doubleflag * 1 : doubleflag * -1);
+        // $($(x.element).children().children().children().children()[0]).children('.votes')[0].innerHTML = x.votes;
         var tmp = $(x.element).children().children().children().children();
         tmp.removeClass('up')
         tmp.removeClass('down')
         tmp.addClass(direction)
-        var oReq = new XMLHttpRequest();
-        oReq.open("GET", "https://vps.boschwitz.me:8443/vote/" + uid + "/" + direction);
-        oReq.send();
-        if (doubleflag == 2) {
-            var oReq2 = new XMLHttpRequest();
-            oReq2.open("GET", "https://vps.boschwitz.me:8443/vote/" + uid + "/" + direction);
-            oReq2.send();
-        }
-        votes[uid] = (direction == 'up' ? 1 : 0);
-        chrome.storage.sync.set({
-            votes: votes
-        });
-        sort();
+        // var oReq = new XMLHttpRequest();
+        // oReq.open("GET", "https://vps.boschwitz.me:8443/vote/" + uid + "/" + direction);
+        // oReq.send();
+        // if (doubleflag == 2) {
+        //     var oReq2 = new XMLHttpRequest();
+        //     oReq2.open("GET", "https://vps.boschwitz.me:8443/vote/" + uid + "/" + direction);
+        //     oReq2.send();
+        // }
+        // votes[uid] = (direction == 'up' ? 1 : 0);
+        // chrome.storage.sync.set({
+        //     votes: votes
+        // });
+        // sort();
     });
 }
 //to fire loadit whenever someone does a new search, i'd do something like
@@ -95,41 +106,43 @@ function loadit() {
 
     var len = $('.rc').length;
     $('.rc').each(function(i) {
-        var x = data[i] = {};
+        var x = {};
         x.index = i;
         x.element = this;
         x.url = this.childNodes[0].childNodes[0].href;
 
+        data[i] = x;
 
-        function handledata(data) {
+        // function handledata(data) {
             console.log(data);
-            x.uid = data.data[0].uid;
-            x.votes = data.data[0].votes;
+            //x.uid = data.data[0].uid;
+            //x.votes = data.data[0].votes;
             x.element.innerHTML = '<table><tbody><tr><td style="text-align:center" class="'
                                   + (votes[x.uid] + 1 ? (votes[x.uid] == 1 ? 'up' : 'down') : '') + '"><span onclick="vote(this,'
-                                  + x.index + ',' + x.uid + ',\'up\')"><img src="' + chrome.extension.getURL('/upvote.png')
-                                  + '" style="filter:grayscale(100%)" class="uparrow" /></span><br><span class="votes">' + x.votes
-                                  + '</span><br><span onclick="vote(this,' + x.index + ',' + x.uid + ',\'down\')"><img src="'
+                                  + x.index + ',\'up\')"><img src="' + chrome.extension.getURL('/upvote.png')
+                                  + '" style="filter:grayscale(0%)" class="uparrow" /></span><br><span class="votes">' //+ x.votes
+                                  + '</span><br><span onclick="vote(this,' + x.index + ',\'down\')"><img src="'
                                   + chrome.extension.getURL('/downvote.png')
-                                  + '" style="filter:grayscale(100%)" class="downarrow" /></span></td><td>' + x.element.childNodes[0].innerHTML
+                                  + '" style="filter:grayscale(0%)" class="downarrow" /></span></td><td>' + x.element.childNodes[0].innerHTML
                                   + (x.element.childNodes[1] ? x.element.childNodes[1].innerHTML : "") + '</td></tr></tbody></table>';
             // here is the best place you could inject your html into the element using x.element.innerHTML or something
 
-            if (i == len - 1) {
-                //everything is done loading here, load keywords
-                loadkeywords();
-            }
-        }
-        $.ajax({
-            type: 'POST',
-            url: "https://vps.boschwitz.me:8443/geturl",
-            data: JSON.stringify({
-                url: x.url
-            }),
-            contentType: 'application/json',
-            dataType: 'json',
-            success: handledata
-        });
+            $('#viewport').css('opacity', '1')
+            // if (i == len - 1) {
+            //     //everything is done loading here, load keywords
+            //     loadkeywords();
+            // }
+        // }
+        // $.ajax({
+        //     type: 'POST',
+        //     url: "https://vps.boschwitz.me:8443/geturl",
+        //     data: JSON.stringify({
+        //         url: x.url
+        //     }),
+        //     contentType: 'application/json',
+        //     dataType: 'json',
+        //     success: handledata
+        // });
     });
 }
 
@@ -250,7 +263,12 @@ function insertionSort() {
             data[j + 1].keywords = data[j].keywords;
             var x = data[j + 1];
             x.index = j + 1;
-            $(x.element).children().children().children().children()[0].innerHTML = '<span onclick="vote(this,' + x.index + ',' + x.uid + ',\'up\')"><img src="' + chrome.extension.getURL('/upvote.png') + '" style="filter:grayscale(100%)" class="uparrow"  /></span><br><span class="votes">' + x.votes + '</span><br><span onclick="vote(this,' + x.index + ',' + x.uid + ',\'down\')"><img src="' + chrome.extension.getURL('/downvote.png') + '" style="filter:grayscale(100%)" class="downarrow"  /></span>'
+            $(x.element).children().children().children().children()[0].innerHTML = '<span onclick="vote(this,' + x.index + ',' + x.uid
+                                                                                  + ',\'up\')"><img src="' + chrome.extension.getURL('/upvote.png')
+                                                            + '" style="filter:grayscale(100%)" class="uparrow"  /></span><br><span class="votes">'
+                                                            + x.votes + '</span><br><span onclick="vote(this,' + x.index + ',' + x.uid
+                                                            + ',\'down\')"><img src="' + chrome.extension.getURL('/downvote.png')
+                                                            + '" style="filter:grayscale(100%)" class="downarrow"  /></span>'
 
             data[j].votes = votes;
             data[j].element.innerHTML = value;
@@ -258,7 +276,12 @@ function insertionSort() {
             data[j].keywords = keywords;
             var x = data[j];
             x.index = j;
-            $(x.element).children().children().children().children()[0].innerHTML = '<span onclick="vote(this,' + x.index + ',' + x.uid + ',\'up\')"><img src="' + chrome.extension.getURL('/upvote.png') + '" style="filter:grayscale(100%)" class="uparrow"  /></span><br><span class="votes">' + x.votes + '</span><br><span onclick="vote(this,' + x.index + ',' + x.uid + ',\'down\')"><img src="' + chrome.extension.getURL('/downvote.png') + '" style="filter:grayscale(100%)" class="downarrow"  /></span>'
+            $(x.element).children().children().children().children()[0].innerHTML = '<span onclick="vote(this,' + x.index + ',' + x.uid
+                                                                                  + ',\'up\')"><img src="' + chrome.extension.getURL('/upvote.png')
+                                                              + '" style="filter:grayscale(100%)" class="uparrow"  /></span><br><span class="votes">'
+                                                              + x.votes + '</span><br><span onclick="vote(this,' + x.index + ',' + x.uid
+                                                              + ',\'down\')"><img src="' + chrome.extension.getURL('/downvote.png')
+                                                              + '" style="filter:grayscale(100%)" class="downarrow"  /></span>'
 
             //console.log(value);
         }
