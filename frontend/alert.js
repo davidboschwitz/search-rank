@@ -1,1 +1,3 @@
-alert('hello');
+document.dispatchEvent(new CustomEvent('loadKeywords', {
+   detail: {}
+}));

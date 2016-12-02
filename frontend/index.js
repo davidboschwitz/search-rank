@@ -9,12 +9,28 @@ chrome.storage.sync.get(function(items) {
 
 $(window).on('load', function() {
     window.setTimeout(loadit, 1000);
-    var el = document.createElement('link');
-    el.rel = "stylesheet";
-    el.href = "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css"
-    document.body.childNodes[0].appendChild(el);
+    injectScripts();
 });
 
+function injectScripts(){
+  injectJS(chrome.extension.getURL('/inject.js'));
+  injectCSS(chrome.extension.getURL('/inject.css'));
+}
+
+function injectCSS(src) {
+   var el = document.createElement('link');
+   el.rel = "stylesheet";
+   el.href = src;
+   document.head.appendChild(el);
+}
+
+function injectJS(src) {
+     var el = document.createElement('script');
+     el.type = "text/javascript";
+     el.src = src;
+     el.id = 'injectedSEARCHJS';
+     document.head.appendChild(el);
+}
 // var evt = document.createEvent('Event');
 // evt.initEvent('myCustomEvent', true, false);
 // this.dispatchEvent(new CustomEvent('vote', {
@@ -36,28 +52,55 @@ $(window).on('load', function() {
 //   tmp.removeClass('down');
 //   tmp.addClass(direction);
 // }
+function davidHashelhoff(input){
+   var hash = 0;
+   if (input === undefined || input === null || input.length == 0)
+       return hash;
+   for (i = 0; i < input.length; i++) {
+       char = input.charCodeAt(i);
+       hash = ((hash<<5)-hash)+char;
+       hash = hash & hash; // Convert to 32bit integer
+   }
+   return hash;
+}
 
 function addVoteListener() {
   votelistener = true;
-    document.addEventListener('vote', function(event) {
+  document.addEventListener('vote', function(event) {
         // do whatever is necessary
         console.log('vote', event)
         var index = event.detail.index;
         var direction = event.detail.direction;
-        var uid = event.detail.uid;
         var x = data[index];
+        var uid = davidHashelhoff(x.url);
+
         var doubleflag = 1;
         if (votes[uid] + 1) {
             if ((direction == 'up' ? 1 : 0) == votes[uid])
                 return;
             doubleflag = 2;
         }
+        console.log(direction);
+        x.direction = direction;
         // x.votes = x.votes + (direction == "up" ? doubleflag * 1 : doubleflag * -1);
         // $($(x.element).children().children().children().children()[0]).children('.votes')[0].innerHTML = x.votes;
         var tmp = $(x.element).children().children().children().children();
+        console.log(tmp)
         tmp.removeClass('up')
         tmp.removeClass('down')
         tmp.addClass(direction)
+
+        //update the local memory
+
+   votes[uid] = (direction == 'up' ? 1 : 0);
+
+   //update the storage with local memory
+   chrome.storage.sync.set({
+       votes: votes
+   });
+
+   data[index] = x;
+
         // var oReq = new XMLHttpRequest();
         // oReq.open("GET", "https://vps.boschwitz.me:8443/vote/" + uid + "/" + direction);
         // oReq.send();
@@ -73,10 +116,21 @@ function addVoteListener() {
         // sort();
     });
 }
+
+document.addEventListener('loadKeywords', function(event){
+ console.log(event);
+ loadkeywords();
+});
 //to fire loadit whenever someone does a new search, i'd do something like
 
-$('.lsb').click(function() {
+$('.lsb, .sbico-c').click(function() {
     loadit()
+});
+
+$(document).keypress(function(e){
+// console.log(e.which);
+if(e.which == 26)
+  loadit();
 });
 
 //and
@@ -100,6 +154,9 @@ votelistener = false;
 
 function loadit() {
   $('#viewport').css('opacity', '0.3');
+  if(document.getElementById('injectedSEARCHJS') == null){
+    injectScripts();
+  }
     addLoader();
     if (!votelistener) addVoteListener();
     console.log('loadingit')
@@ -117,13 +174,14 @@ function loadit() {
             console.log(data);
             //x.uid = data.data[0].uid;
             //x.votes = data.data[0].votes;
+            x.uid = davidHashelhoff(x.url);
             x.element.innerHTML = '<table><tbody><tr><td style="text-align:center" class="'
                                   + (votes[x.uid] + 1 ? (votes[x.uid] == 1 ? 'up' : 'down') : '') + '"><span onclick="vote(this,'
                                   + x.index + ',\'up\')"><img src="' + chrome.extension.getURL('/upvote.png')
-                                  + '" style="filter:grayscale(0%)" class="uparrow" /></span><br><span class="votes">' //+ x.votes
+                                  + '" style="filter:grayscale(100%)" class="uparrow" /></span><br><span class="votes">' //+ x.votes
                                   + '</span><br><span onclick="vote(this,' + x.index + ',\'down\')"><img src="'
                                   + chrome.extension.getURL('/downvote.png')
-                                  + '" style="filter:grayscale(0%)" class="downarrow" /></span></td><td>' + x.element.childNodes[0].innerHTML
+                                  + '" style="filter:grayscale(100%)" class="downarrow" /></span></td><td>' + x.element.childNodes[0].innerHTML
                                   + (x.element.childNodes[1] ? x.element.childNodes[1].innerHTML : "") + '</td></tr></tbody></table>';
             // here is the best place you could inject your html into the element using x.element.innerHTML or something
 
@@ -151,9 +209,12 @@ function loadkeywords() {
     //must run after loadit
     console.log('loadkeywords')
     console.log(data.length)
+    console.log(data);
     var urls = [];
     for (var i = 0; i < data.length; i++) {
+      if (data[i].direction == "up"){
         urls.push(data[i].url)
+      }
     }
 
     function handledata(rtn) {
