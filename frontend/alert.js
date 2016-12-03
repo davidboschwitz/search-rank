@@ -1,3 +1,5 @@
 document.dispatchEvent(new CustomEvent('loadKeywords', {
-   detail: {}
+   detail: {
+     
+   }
 }));

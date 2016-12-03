@@ -210,9 +210,10 @@ function loadkeywords() {
     console.log('loadkeywords')
     console.log(data.length)
     console.log(data);
+    console.log(votes);
     var urls = [];
     for (var i = 0; i < data.length; i++) {
-      if (data[i].direction == "up"){
+      if (votes[data[i].uid]){
         urls.push(data[i].url)
       }
     }
@@ -257,7 +258,7 @@ function loadkeywords() {
 
 function afterload() {
     //this is called after everything is loaded from the server
-    sort()
+    //sort()
     var keywordString = "\t\t\tTop keywords = " + topKeywords[0];
     for (i = 1; i < 5; i++) {
         keywordString += ", " + topKeywords[i];
