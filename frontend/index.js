@@ -260,8 +260,13 @@ function afterload() {
     //this is called after everything is loaded from the server
     //sort()
     var keywordString = "\t\t\tTop keywords = " + topKeywords[0];
-    for (i = 1; i < 5; i++) {
+    var index = 1;
+    var kwCount = 1;
+    for (i = 1; i < topKeywords.Count; i++) {
+      if(kwCount < 5 && !keywordString.contains(topKeywords[i]))
+      {
         keywordString += ", " + topKeywords[i];
+      }
     }
     var keywordNode = document.createElement('div');
     keywordNode.appendChild(document.createTextNode(keywordString));
