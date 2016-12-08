@@ -220,15 +220,22 @@ function loadkeywords() {
 
     function handledata(rtn) {
         console.log(rtn);
+         map = {};
         for (var i = 0; i < rtn.keywords.length; i++) {
             if (data[i] == undefined)
                 continue;
             data[i].keywords = rtn.keywords[i];
-
-            var title_keywords = "Top Keywords: ";
-            for (var j = 0; rtn.keywords[i] != null && j < rtn.keywords[i].length && j < 3; j++) {
+            title_keywords = "Top Keywords: ";
+            for (var j = 0; rtn.keywords[i] != null && j < rtn.keywords[i].length && j < 10; j++) {
+                if(j < 3)
                 title_keywords += rtn.keywords[i][j].term + ", ";
                 if (j == 0) topKeywords[i] = rtn.keywords[i][j].term;
+
+                if(map[rtn.keywords[i][j].term]){
+                  map[rtn.keywords[i][j].term] += rtn.keywords[i][j].rank;
+                } else {
+                  map[rtn.keywords[i][j].term] = rtn.keywords[i][j].rank;
+                }
             }
 
             data[i].title = title_keywords.substring(0, title_keywords.length - 2);
@@ -238,6 +245,27 @@ function loadkeywords() {
             console.log($(data[i].element).children('.r').children('a')[0]);
             console.log(title_keywords)
         }
+        console.log('map');
+        console.log(map);
+        keywords = [];
+        for(var key in map){
+          keywords.push({term: key, rank:  map[key]});
+        }
+        keywords.sort(function (a, b){
+          if (a.rank > b.rank) {
+            return -1;
+          }
+          if (a.rank < b.rank) {
+            return 1;
+          }
+          // a must be equal to b
+          return 0;
+        });
+        console.log(keywords);
+        title_keywords = 'Top Keywords: ';
+        for(var i = 0; i < 3 && keywords[i]; i++)
+         title_keywords += keywords[i].term + ', ';
+        title_keywords = title_keywords.substring(0, title_keywords.length - 2);
         //everything is done
         afterload();
     }
@@ -259,15 +287,30 @@ function loadkeywords() {
 function afterload() {
     //this is called after everything is loaded from the server
     //sort()
-    var keywordString = "\t\t\tTop keywords = " + topKeywords[0];
+    suggs = [];
+    $('._e4b').children('a').each(function(e){suggs.push(this.innerText)});
+    for(var i = 0; i < keywords.length && i < 5; i++)
+      suggs.push($('.gsfi').val() + ' ' + keywords[i].term);
+    for(var i = 0; i < keywords.length && i < 5; i++)
+      suggs.push(keywords[i].term);
+    // title_keywords.substring(14).split(', ').forEach(function(v){
+    //   if(v)
+    //   suggs.push(v);
+    //   console.log(v);
+    // });
+    var keywordString = title_keywords;
     var index = 1;
     var kwCount = 1;
-    for (i = 1; i < topKeywords.Count; i++) {
-      if(kwCount < 5 && !keywordString.contains(topKeywords[i]))
-      {
-        keywordString += ", " + topKeywords[i];
-      }
-    }
+    // for (i = 1; i < topKeywords.length; i++) {
+    //   if(kwCount < 5 && !keywordString.contains(topKeywords[i]))
+    //   {
+    //     keywordString += ", " + topKeywords[i];
+    //   }
+    // }
+    console.log(suggs);
+    chrome.runtime.sendMessage({suggs: suggs}, function(response) {
+      console.log(response);
+    });
     var keywordNode = document.createElement('div');
     keywordNode.appendChild(document.createTextNode(keywordString));
     keywordNode.style.textAlign = "center";
